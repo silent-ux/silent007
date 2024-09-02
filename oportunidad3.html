@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingrese Nombre</title>
+    <style>
+        body {
+            background-image: url('marga.jpeg');
+            background-color: #f0f4f8;
+            color: #2c3e50;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #3498db;
+            color: #ecf0f1;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(1);
+        }
+        .audio-container {
+            margin: 20px 0;
+        }
+        audio {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 4px;
+            background-color: #ecf0f1;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #2c3e50;
+            font-style: italic;
+        }
+        #subtitle {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What's the problem, Baby?</h1>
+        <input type="text" id="nameInput" placeholder="Escribe tu nombre">
+        <button onclick="checkName()">Enviar</button>
+        <div class="audio-container">
+            <audio id="backgroundMusic" controls>
+                <source src="accidentally.mp3" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+            <button onclick="goToAnotherPage()">No tengo tiempo, ve al final</button>
+        </div>
+        <div id="subtitle"></div>
+        <div id="loadingMessage" class="loading">Cargando...</div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('backgroundMusic');
+        const subtitleElement = document.getElementById('subtitle');
+        const loadingMessage = document.getElementById('loadingMessage');
+
+        const subtitles = [
+            { start: 0.880, end: 1.840, text: "Entonces ella dijo:" },
+            { start: 1.840, end: 4.500, text: "¿Cual es el problema, baby?" },
+            { start: 4.500, end: 6.240, text: "Yo no sé cuál es el problema" },
+            { start: 6.240, end: 8.400, text: "Bueno, tal vez yo esté enamorado" },
+            { start: 8.400, end: 10.900, text: "Pienso en ello cada vez," },
+            { start: 10.900, end: 13.180, text: "Y no puedo dejar de pensar en eso" },
+            { start: 13.320, end: 16.420, text: "¿Cuánto más tardará en curar esto?" },
+            { start: 16.680, end: 17.620, text: "Solo para curarlo" },
+            { start: 17.620, end: 20.120, text: "Porque no puedo ignorarlo si es amor" },
+            { start: 20.120, end: 20.660, text: "Amor" },
+            { start: 20.660, end: 22.760, text: "Me hace querer voltearme y enfrentarlo" },
+            { start: 22.760, end: 26.200, text: "Pero no sé nada del amor" },
+            { start: 26.500, end: 28.100, text: "Vamos, vamos!" },
+            { start: 28.100, end: 30.060, text: "Gira un poco más rápido" },
+            { start: 30.060, end: 31.440, text: "Vamos, vamos!" },
+            { start: 31.440, end: 33.560, text: "El mundo te seguirá después" },
+            { start: 33.560, end: 35.320, text: "Vamos, vamos!" },
+            { start: 35.320, end: 41.660, text: "Porque todo el mundo está tras el amor..." },
+            { start: 44.160, end: 47.920, text: "Así que dije: Soy una bola de nieve corriendo" },
+            { start: 47.920, end: 50.120, text: "Corriendo hacia la primavera" },
+            { start: 50.120, end: 51.900, text: "Que está llegando en todo este amor" },
+            { start: 51.900, end: 53.660, text: "Derritiéndose bajo el cielo azul" },
+            { start: 53.660, end: 57.060, text: "La luz del sol deslumbra amor" },
+            { start: 57.200, end: 61.320, text: "Bueno, cariño me rindo ante el helado de fresa" },
+            { start: 61.320, end: 64.420, text: "Todo este amor, nunca jamás terminará" },
+            { start: 64.420, end: 66.420, text: "Bueno, no quise hacerlo" },
+            { start: 66.420, end: 70.400, text: "Pero no hay escapatoria de tu amor" },
+            { start: 70.460, end: 72.700, text: "Esas líneas de luz" },
+            { start: 72.700, end: 74.760, text: "quieren decir que nunca estaremos solos" },
+            { start: 74.760, end: 76.200, text: "nunca estaremos solos" },
+            { start: 76.200, end: 76.900, text: "No, no" },
+            { start: 76.900, end: 78.540, text: "Vamos, vamos!" },
+            { start: 78.540, end: 80.460, text: "Salta un poco más alto" },
+            { start: 80.460, end: 81.740, text: "Vamos, vamos" },
+            { start: 81.740, end: 83.940, text: "Si te sientes un poco más ligero" },
+            { start: 83.940, end: 85.200, text: "Vamos, vamos" },
+            { start: 85.200, end: 92.980, text: "Alguna vez estuvimos enamorados" },
+            { start: 93.220, end: 96.540, text: "Accidentalmente enamorados" },
+            { start: 96.660, end: 100.060, text: "Accidentalmente enamorados" },
+            { start: 100.180, end: 103.580, text: "Accidentalmente enamorados" },
+            { start: 103.660, end: 107.000, text: "Accidentalmente enamorados" },
+            { start: 107.100, end: 110.300, text: "Accidentalmente enamorados" },
+            { start: 110.360, end: 113.940, text: "Accidentalmente enamorados" },
+            { start: 113.940, end: 115.300, text: "Accidentalmente" },
+            { start: 115.300, end: 121.020, text: "Estoy enamorado" },
+            { start: 121.000, end: 122.260, text: "Accidentalmente" },
+            { start: 122.260, end: 127.900, text: "Estoy enamorado" },
+            { start: 127.900, end: 131.620, text: "Accidentalmente enamorados" },
+            { start: 131.620, end: 135.260, text: "Estoy enamorado" },
+            { start: 135.420, end: 141.000, text: "Estoy enamorado" }
+        ];
+
+        audio.volume = 0.4;
+
+        document.body.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+            }
+        });
+
+        function updateSubtitle() {
+            const currentTime = audio.currentTime;
+            const currentSubtitle = subtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end);
+
+            if (currentSubtitle) {
+                subtitleElement.innerText = currentSubtitle.text;
+                subtitleElement.style.visibility = "visible";
+            } else {
+                subtitleElement.style.visibility = "hidden";
+            }
+        }
+
+        audio.addEventListener('timeupdate', updateSubtitle);
+
+        function checkName() {
+            const name = document.getElementById('nameInput').value.trim().toLowerCase();
+            const validNames = ['andrea', 'andreita'];
+
+            loadingMessage.style.display = 'block'; // Muestra el mensaje de carga
+
+            setTimeout(() => {
+                if (validNames.includes(name))  {
+                    window.location.href = 'form.html';
+                } else {
+                    window.location.href = 'error.html';
+                }
+            }, 1000); // Simula un breve retraso antes de redirigir
+        }
+
+        function goToAnotherPage() {
+            loadingMessage.style.display = 'block'; // Muestra el mensaje de carga
+            setTimeout(() => {
+                window.location.href = 'telacreiste.html';
+            }, 1000); // Simula un breve retraso antes de redirigir
+        }
+    </script>
+</body>
+</html>

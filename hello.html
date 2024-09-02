@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio con Subtítulos Precisos</title>
+    <style>
+        body {
+            background: url('margarita.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        .message {
+            font-size: 36px;
+            font-weight: bold;
+            color: #095247;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .audio-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(247, 231, 216, 0.9); /* Light background with transparency */
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .audio-container button {
+            background-color: #ffb6c1;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .audio-container button:hover {
+            background-color: #ff8c94;
+        }
+        .audio-container input[type="range"] {
+            -webkit-appearance: none;
+            background: #f7e7d8;
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            outline: none;
+            margin: 10px 0;
+        }
+        .audio-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            background: #ffb6c1;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .audio-container input[type="range"]::-moz-range-thumb {
+            background: #ffb6c1;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .time-container {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        #subtitles {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+            transition: opacity 1s ease-out;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+            opacity: 0;
+        }
+        .audio-container button:focus {
+            outline: 2px solid #ffb6c1;
+            outline-offset: 2px;
+        }
+        .audio-container input[type="range"]:focus {
+            outline: 2px solid #ffb6c1;
+            outline-offset: 2px;
+        }
+        .extra-button {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffb6c1;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .extra-button:hover {
+            background-color: #ff8c94;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">¡Felicidades por llegar hasta aquí!<br>Tu regalo está en esta ubicación:<br><strong>Locker 999</strong></div>
+    <div class="audio-container">
+        <audio id="audio" > /* Se quito controls */
+            <source src="hello.mp3" type="audio/mpeg">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
+        <button onclick="document.getElementById('audio').play()">Reproducir</button>
+        <button onclick="document.getElementById('audio').pause()">Pausar</button>
+        <input type="range" id="progress" min="0" max="100" step="0.1" value="0" aria-label="Progreso del audio">
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="1" onchange="document.getElementById('audio').volume = this.value" aria-label="Control de volumen">
+        <div class="time-container">
+            <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+        </div>
+    </div>
+    <div id="subtitles" role="region" aria-live="polite"></div>
+    <a href="telacreiste.html" class="extra-button">Ver otro final 🎉</a>
+
+    <script>
+        const subtitles = [
+            { start: 13.12, end: 15.60, text: "Cuando me veo en estos momentos" },
+            { start: 15.60, end: 18.10, text: "Siento que de verdad estoy joven" },
+            { start: 18.10, end: 20.18, text: "A pesar de que estas frente a mí" },
+            { start: 20.18, end: 23.00, text: "No sé qué hacer" },
+            { start: 23.00, end: 27.94, text: "A la gente que está enamorada" },
+            { start: 27.94, end: 32.66, text: "Por favor, díganme cómo comenzaron a amar" },
+            { start: 32.88, end: 37.84, text: "¿Llegará el día que sujetaré su mano?" },
+            { start: 37.84, end: 42.54, text: "¿También llegará el día que la bese encima de sus ojos cerrados?" },
+            { start: 42.54, end: 44.96, text: "Hola, Hola" },
+            { start: 44.96, end: 47.48, text: "He encontrado el valor" },
+            { start: 47.48, end: 48.34, text: "Hola" },
+            { start: 48.34, end: 49.60, text: "Hola!!!" },
+            { start: 49.60, end: 52.44, text: "Quiero hablar contigo por un momento" },
+            { start: 52.44, end: 53.36, text: "Hola!" },
+            { start: 53.36, end: 54.86, text: "Hola!!!" },
+            { start: 54.86, end: 57.70, text: "Puede que este apresurando las cosas" },
+            { start: 57.70, end: 60.50, text: "¿Quién sabe? Podríamos..." },
+            { start: 60.50, end: 63.18, text: "terminar bien" },
+            { start: 67.28, end: 70.20, text: "Ya sea que me acerque a ti" },
+            { start: 70.20, end: 72.50, text: "O que espere un poco más" },
+            { start: 72.50, end: 74.56, text: "Que todo el mundo diga cosas diferentes" },
+            { start: 74.56, end: 77.48, text: "hace que sea mucho más difícil (Puede que no me creas)" },
+            { start: 77.48, end: 79.96, text: "*Ella tiene estándares más altos de lo que parece*" },
+            { start: 79.96, end: 83.00, text: "Este tipo de cosas son extrañas para mí" },
+            { start: 83.00, end: 87.08, text: "Por favor, cree lo que digo" },
+            { start: 87.18, end: 92.16, text: "¿Llegará el día que casualmente la abrace?" },
+            { start: 92.26, end: 97.84, text: "Creo que todo va a salir de la forma que pienso que saldrá" },
+            { start: 97.84, end: 99.44, text: "Hello!!" },
+            { start: 99.44, end: 101.90, text: "He encontrado el valor" },
+            { start: 101.90, end: 104.00, text: "Hello, Hello" },
+            { start: 104.00, end: 106.86, text: "Quiero hablar contigo por un momento" },
+            { start: 106.86, end: 109.36, text: "Hello, Hello!" },
+            { start: 109.36, end: 112.08, text: "Puede que este apresurando las cosas" },
+            { start: 112.08, end: 115.22, text: "¿Quién sabe? Podríamos..." },
+            { start: 116.40, end: 118.80, text: "No es mi primera vez" },
+            { start: 118.90, end: 121.30, text: "siendo honesto" },
+            { start: 121.38, end: 126.22, text: "He experimentado el amor y la separación" },
+            { start: 126.32, end: 128.72, text: "Pero es difícil" },
+            { start: 128.72, end: 131.30, text: "por favor créeme" },
+            { start: 131.30, end: 136.18, text: "Eres diferente" },
+            { start: 139.20, end: 141.50, text: "Apuesto todo esta vez" },
+            { start: 148.86, end: 151.64, text: "No sé cómo te sientes en este momento" },
+            { start: 151.70, end: 154.54, text: "¿Quién sabe? Podríamos" },
+            { start: 156.58, end: 160.22, text: "Hola, las veces que estuve a tu lado" },
+            { start: 160.22, end: 163.46, text: "no se pueden comparar con ninguna otra felicidad" },
+            { start: 163.46, end: 166.02, text: "No puedo expresarme hacia ti" },
+            { start: 166.02, end: 168.40, text: "Mi corazón quiere todo de ti, nunca dejarte ir" },
+            { start: 168.40, end: 171.44, text: "Si esto es amor, nunca te dejaré ir" },
+            { start: 171.44, end: 174.26, text: "¿Quién sabe? Nosotros dos :)" },
+            { start: 174.26, end: 177.22, text: "Podría ser el destino..." }
+        ];
+
+        const subtitleElement = document.getElementById('subtitles');
+        const audioElement = document.getElementById('audio');
+        const progressElement = document.getElementById('progress');
+        const currentTimeElement = document.getElementById('current-time');
+        const durationElement = document.getElementById('duration');
+
+        audioElement.addEventListener('timeupdate', () => {
+            const currentTime = audioElement.currentTime;
+            const duration = audioElement.duration;
+            const currentSubtitle = subtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end);
+
+            if (currentSubtitle) {
+                subtitleElement.textContent = currentSubtitle.text;
+                subtitleElement.style.opacity = 1;
+            } else {
+                subtitleElement.style.opacity = 0;
+            }
+
+            const progressValue = (currentTime / duration) * 100;
+            progressElement.value = progressValue;
+
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = Math.floor(currentTime % 60);
+            currentTimeElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            const durationMinutes = Math.floor(duration / 60);
+            const durationSeconds = Math.floor(duration % 60);
+            durationElement.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
+        });
+
+        progressElement.addEventListener('input', () => {
+            const duration = audioElement.duration;
+            const newTime = (progressElement.value / 100) * duration;
+            audioElement.currentTime = newTime;
+        });
+    </script>
+</body>
+</html>
+
+

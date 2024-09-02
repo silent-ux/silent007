@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video</title>
+    <style>
+        body {
+            background-color: #2c3e50; /* Fondo oscuro */
+            color: #ecf0f1; /* Color del texto claro */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Evita barras de desplazamiento al mover el texto */
+        }
+        .container {
+            text-align: center;
+            position: relative; /* Necesario para posicionar el texto en relación a este contenedor */
+            width: 100vw;
+            height: 100vh;
+        }
+        video {
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid #ecf0f1; /* Borde blanco */
+            border-radius: 8px;
+        }
+        #movableText {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ecf0f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1></h1>
+        <video id="myVideo" controls>
+            <source src="rick.mp4" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+        </video>
+        <div id="movableText">Haz clic para salir</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('myVideo');
+        const movableText = document.getElementById('movableText');
+        const container = document.querySelector('.container');
+
+        // Reproducir el video al hacer clic en cualquier parte del documento
+        document.addEventListener('click', function() {
+            if (video.paused) {
+                video.play();
+            }
+        });
+
+        // Mover el texto a una posición aleatoria fuera del contenedor al hacer clic en él
+        movableText.addEventListener('click', function() {
+            const containerRect = container.getBoundingClientRect();
+            
+            const newX = Math.random() * (window.innerWidth - movableText.offsetWidth);
+            const newY = Math.random() * (window.innerHeight - movableText.offsetHeight);
+
+            movableText.style.left = `${newX}px`;
+            movableText.style.top = `${newY}px`;
+        });
+
+        // Redirigir al terminar el video
+        video.onended = function() {
+            window.location.href = 'oportunidad3.html'; // Cambia 'oportunidad3.html' por la URL de destino
+        };
+    </script>
+</body>
+</html>
