@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una Buena Canción</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer; /* Cambia el cursor al pasar sobre la página */
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
+        .video-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        video {
+            width: 80%;
+            height: auto;
+            border: none;
+        }
+
+        .cloud {
+            position: absolute;
+            background: url('https://img.icons8.com/ios/50/ffffff/cloud.png') no-repeat;
+            background-size: contain;
+            width: 100px;
+            height: 60px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <header>Aquí yace una buena canción</header>
+    <div class="video-container">
+        <video id="video" autoplay muted>
+            <source src="jesus.mp4" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+        </video>
+    </div>
+
+    <!-- Nubes -->
+    <div class="cloud" style="top: 10%; left: 10%;"></div>
+    <div class="cloud" style="top: 30%; left: 30%;"></div>
+    <div class="cloud" style="top: 50%; left: 50%;"></div>
+    <div class="cloud" style="top: 70%; left: 20%;"></div>
+    <div class="cloud" style="top: 40%; left: 80%;"></div>
+    <div class="cloud" style="top: 60%; left: 40%;"></div>
+    <div class="cloud" style="top: 80%; left: 60%;"></div>
+
+    <script>
+        // Obtener el elemento de video
+        const video = document.getElementById('video');
+
+        // Función para alternar la reproducción del video
+        function toggleVideoPlayback() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        // Función para aumentar el volumen gradualmente
+        function graduallyIncreaseVolume(video, duration) {
+            let volume = 0;
+            video.volume = volume;
+            video.muted = false; // Asegúrate de desmutear el video
+            const increment = 0.01; // Incremento del volumen
+            const interval = duration / (1 / increment); // Tiempo entre cada incremento
+            
+            const volumeInterval = setInterval(() => {
+                if (volume < 1) {
+                    volume += increment;
+                    video.volume = volume;
+                } else {
+                    clearInterval(volumeInterval);
+                }
+            }, interval);
+        }
+
+        // Reproducir el video automáticamente y aumentar el volumen gradualmente
+        window.onload = () => {
+            video.play();
+            graduallyIncreaseVolume(video, 10000); // Aumentar el volumen en 10 segundos
+        };
+
+        // Alternar la reproducción del video al hacer clic en cualquier parte de la página
+        document.body.addEventListener('click', toggleVideoPlayback);
+
+        // Función para mover las nubes aleatoriamente
+        function moveClouds() {
+            const clouds = document.querySelectorAll('.cloud');
+            clouds.forEach(cloud => {
+                let top = Math.random() * 100;
+                let left = Math.random() * 100;
+                cloud.style.top = `${top}%`;
+                cloud.style.left = `${left}%`;
+            });
+        }
+
+        // Mueve las nubes al cargar la página
+        window.onload = () => {
+            moveClouds();
+            video.play(); // Reproducir el video automáticamente
+            graduallyIncreaseVolume(video, 10000); // Aumentar el volumen en 10 segundos
+        };
+
+        // Opcional: Mueve las nubes periódicamente
+        setInterval(moveClouds, 5000);
+    </script>
+</body>
+</html>
