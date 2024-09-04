@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de la Culebra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            background-color: #000;
+            display: block;
+            margin: 0 auto;
+            border: 2px solid #333;
+        }
+        #subtitulos {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #fff;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .control-button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            font-size: 1.5em;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+        }
+        .control-button:active {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Juego de la Culebra</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="subtitulos">¡Buena suerte!</div>
+
+    <audio id="gameOverSound" src="love.mp3"></audio>
+
+    <div class="controls">
+        <button class="control-button" id="left">←</button>
+        <button class="control-button" id="up">↑</button>
+        <button class="control-button" id="down">↓</button>
+        <button class="control-button" id="right">→</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let snake = [{x: 150, y: 150}, {x: 140, y: 150}, {x: 130, y: 150}];
+        let dx = 10;
+        let dy = 0;
+        let foodX;
+        let foodY;
+        let score = 0;
+
+        const subtitles = [
+           { start: 1.540, end: 3.660, text: "Nos encontramos" },
+            { start: 3.660, end: 5.660, text: "y nos quisimos," },
+            { start: 5.660, end: 8.980, text: "se ha convertido en un recuerdo duradero," },
+            { start: 9.080, end: 11.760, text: "un muy buen melodrama romántico," },
+            { start: 11.760, end: 13.800, text: "con un final bastante decente" },
+            { start: 13.800, end: 15.360, text: "eso es suficiente para mí," },
+            { start: 15.360, end: 17.360, text: "yo te amaba." },
+            { start: 17.360, end: 18.620, text: "Lo hicimos juntos," },
+            { start: 18.620, end: 21.900, text: "nuestro escenario de amor" },
+            { start: 21.960, end: 25.980, text: "ahora las luces se oscurecen" },
+            { start: 25.980, end: 30.040, text: "y si damos vuelta a la última página" },
+            { start: 30.040, end: 34.120, text: "silenciosamente llegaremos al final" },
+            { start: 34.900, end: 36.460, text: "no esta completamente bien," },
+            { start: 36.460, end: 38.500, text: "atravesar un rompimiento" },
+            { start: 38.500, end: 39.480, text: "Tenemos un ayer," },
+            { start: 39.480, end: 40.520, text: "un hoy..." },
+            { start: 40.520, end: 42.560, text: "pero no un mañana" },
+            { start: 42.760, end: 44.020, text: "y aunque duela" },
+            { start: 44.020, end: 46.220, text: "si lo alargamos más, las heridas empeorarán" },
+            { start: 46.620, end: 47.720, text: "Te amé" },
+            { start: 47.720, end: 48.860, text: "fui amado," },
+            { start: 48.860, end: 50.860, text: "así que con esto estoy bien" },
+            { start: 50.940, end: 53.740, text: "En el transcurso de mi vida," },
+            { start: 54.460, end: 57.920, text: "a veces recordaré" },
+            { start: 58.520, end: 61.920, text: "Si tú estás en esos recuerdos," },
+            { start: 62.580, end: 65.500, text: "con eso me basta :)" },
+            { start: 66.500, end: 68.660, text: "Nos encontramos" },
+            { start: 68.740, end: 70.680, text: "y nos quisimos," },
+            { start: 70.680, end: 74.080, text: "Se convirtió en un recuerdo que no se puede borrar" },
+            { start: 74.080, end: 76.840, text: "Un melodrama digno de ver" },
+            { start: 76.840, end: 78.840, text: "Un final aceptable" },
+            { start: 78.840, end: 80.380, text: "eso es suficiente para mí," },
+            { start: 80.380, end: 82.340, text: "Yo te queria" },
+            { start: 82.420, end: 83.700, text: "Lo hicimos juntos," },
+            { start: 83.700, end: 87.040, text: "nuestro escenario de amor" },
+            { start: 87.040, end: 90.840, text: "ahora las luces se oscurecen" },
+            { start: 91.060, end: 95.120, text: "y si damos vuelta a la última página" },
+            { start: 95.120, end: 98.720, text: "silenciosamente llegaremos al final" },
+            { start: 99.140, end: 102.800, text: "siento una punzada entre las costillas" },
+            { start: 103.520, end: 106.800, text: "Esa mirada tuya que me hacía sentir amado" },
+            { start: 107.380, end: 109.680, text: "Aprendí tanto de ti," },
+            { start: 109.840, end: 111.940, text: "completaste mi otra mitad" },
+            { start: 112.100, end: 113.500, text: "Eras una persona demasiado valiosa" },
+            { start: 113.500, end: 115.500, text: "para dejar en el pasado" },
+            { start: 116.000, end: 119.120, text: "En el transcurso de mi vida," },
+            { start: 119.480, end: 123.440, text: "a veces recordaré" },
+            { start: 123.580, end: 127.300, text: "Si tú estás en esos recuerdos," },
+            { start: 127.600, end: 130.920, text: "con eso me basta" },
+            { start: 131.620, end: 133.740, text: "Nos amamos," },
+            { start: 133.740, end: 135.740, text: "nos encontramos" },
+            { start: 135.820, end: 139.140, text: "Se convirtió en un recuerdo que no se puede borrar" },
+            { start: 139.420, end: 141.920, text: "Un melodrama digno de ver" },
+            { start: 141.920, end: 143.920, text: "Un final aceptable" },
+            { start: 143.920, end: 145.500, text: "Con eso es suficiente," },
+            { start: 145.500, end: 148.200, text: "te amé" },
+            { start: 148.300, end: 150.340, text: "yo..." },
+            { start: 150.340, end: 152.320, text: "te extraño" },
+            { start: 152.560, end: 155.500, text: "pero intentaré no extrañarte" },
+            { start: 155.960, end: 158.420, text: "Te recordaré..." },
+            { start: 158.420, end: 160.480, text: "como una cálida primavera" },
+            { start: 160.480, end: 163.540, text: "en una película" },
+            { start: 163.820, end: 168.340, text: "El escenario de amor que creamos" },
+            { start: 168.340, end: 172.220, text: "Ahora las luces se apagan" },
+            { start: 172.400, end: 176.440, text: "Cuando pasas la última página" },
+            { start: 176.440, end: 180.280, text: "El telón cae en silencio" },
+            { start: 181.260, end: 184.560, text: "LO INTENTAMOS AUNQUE DOLIO!" },
+            { start: 185.360, end: 188.440, text: "Y SENTIMOS CELOS DE MANERA RIDICULA! :)" },
+            { start: 189.480, end: 193.520, text: "Nos amamos como locos (I ain't gonna love ya)" },
+            { start: 193.520, end: 196.880, text: "con eso es suficiente (I was your love)" },
+            { start: 196.880, end: 198.880, text: "nos encontramos" },
+            { start: 198.880, end: 200.880, text: "Nos amamos" },
+            { start: 200.880, end: 202.480, text: "Con eso es suficiente" },
+            { start: 202.480, end: 205.020, text: "Te amaba..." }
+            // Incluye aquí el resto de tus subtítulos
+        ];
+
+        function main() {
+            if (gameOver()) {
+                document.getElementById("gameOverSound").play();
+                document.getElementById("subtitulos").innerText = "¡Perdiste! Intenta de nuevo.";
+                return;
+            }
+            setTimeout(() => {
+                clearCanvas();
+                drawFood();
+                advanceSnake();
+                drawSnake();
+                main();
+            }, 100);
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawSnake() {
+            snake.forEach(part => {
+                ctx.fillStyle = "lightgreen";
+                ctx.strokeStyle = "darkgreen";
+                ctx.fillRect(part.x, part.y, 10, 10);
+                ctx.strokeRect(part.x, part.y, 10, 10);
+            });
+        }
+
+        function advanceSnake() {
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            snake.unshift(head);
+
+            if (snake[0].x === foodX && snake[0].y === foodY) {
+                score += 10;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+        }
+
+        function gameOver() {
+            for (let i = 4; i < snake.length; i++) {
+                if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
+            }
+            const hitLeftWall = snake[0].x < 0;
+            const hitRightWall = snake[0].x >= canvas.width;
+            const hitTopWall = snake[0].y < 0;
+            const hitBottomWall = snake[0].y >= canvas.height;
+
+            return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall;
+        }
+
+        function drawFood() {
+            ctx.fillStyle = "red";
+            ctx.fillRect(foodX, foodY, 10, 10);
+        }
+
+        function generateFood() {
+            foodX = Math.floor(Math.random() * (canvas.width / 10)) * 10;
+            foodY = Math.floor(Math.random() * (canvas.height / 10)) * 10;
+        }
+
+        function changeDirection(dir) {
+            if (dir === 'left' && dx === 0) {
+                dx = -10;
+                dy = 0;
+            }
+            if (dir === 'up' && dy === 0) {
+                dx = 0;
+                dy = -10;
+            }
+            if (dir === 'right' && dx === 0) {
+                dx = 10;
+                dy = 0;
+            }
+            if (dir === 'down' && dy === 0) {
+                dx = 0;
+                dy = 10;
+            }
+        }
+
+        document.getElementById("left").addEventListener("click", () => changeDirection('left'));
+        document.getElementById("up").addEventListener("click", () => changeDirection('up'));
+        document.getElementById("down").addEventListener("click", () => changeDirection('down'));
+        document.getElementById("right").addEventListener("click", () => changeDirection('right'));
+
+        function updateSubtitles() {
+            const audio = document.getElementById("gameOverSound");
+            const currentTime = audio.currentTime;
+
+            for (let i = 0; i < subtitles.length; i++) {
+                if (currentTime >= subtitles[i].start && currentTime <= subtitles[i].end) {
+                    document.getElementById("subtitulos").innerText = subtitles[i].text;
+                    break;
+                } else if (currentTime > subtitles[i].end) {
+                    document.getElementById("subtitulos").innerText = "";
+                }
+            }
+        }
+
+        document.getElementById("gameOverSound").addEventListener("timeupdate", updateSubtitles);
+
+        generateFood();
+        main();
+    </script>
+</body>
+</html>
