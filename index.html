@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Falabella Logistica Inversa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background-color: #78BE20; /* verde Falabella */
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    /* Pop-up genérico */
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    .popup.fade-out {
+      opacity: 0;
+    }
+    .popup-content {
+      position: relative;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 10px;
+      max-width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .popup video, .popup iframe, .popup img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #333;
+      font-weight: bold;
+    }
+    .exit-btn {
+      display: block;
+      margin: 1rem auto 0;
+      padding: 0.6rem 1.2rem;
+      background: #78BE20;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    /* Video principal */
+    .main-video {
+      max-width: 800px;
+      margin: 2rem auto;
+      text-align: center;
+    }
+    .main-video video {
+      width: 100%;
+      border-radius: 10px;
+    }
+    /* Grid de videos */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .video-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      text-align: center;
+    }
+    .video-card video {
+      width: 100%;
+      border-radius: 8px;
+    }
+    .video-card h3 {
+      margin: 0.5rem 0;
+      color: #78BE20;
+    }
+    /* Botón */
+    .btn {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.8rem 1.5rem;
+      background: #78BE20;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #5c9c18;
+    }
+    /* Lista desplegable */
+    .dropdown {
+      max-width: 400px;
+      margin: 1rem auto 3rem;
+      text-align: center;
+    }
+    select {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Saga Falabella - Logistica Inversa
+  </header>
+
+  <!-- Pop-up Video -->
+  <div class="popup" id="popupVideoContainer">
+    <div class="popup-content">
+      <span class="close-btn" onclick="cerrarPopup('popupVideoContainer','popupVideo')">&times;</span>
+      <video id="popupVideo" autoplay muted controls>
+        <source src="C:/Users/ZEN/Desktop/Falabella_QR/Videos Finales/Introducción/Introducción.mp4" type="video/mp4">
+        Tu navegador no soporta video.
+      </video>
+      <button class="exit-btn" onclick="cerrarPopup('popupVideoContainer','popupVideo')">Salir del video</button>
+    </div>
+  </div>
+
+  <!-- Video principal -->
+  <div class="main-video">
+    <video controls>
+      <source src="intro.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Videos en columnas -->
+  <div class="video-grid">
+    <div class="video-card">
+      <h3>Vendido por Falabella</h3>
+      <video controls>
+        <source src="fala.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="video-card">
+      <h3>Vendido por Tottus y Sodimac</h3>
+      <video controls>
+        <source src="bu.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="video-card">
+      <h3>Vendido por Sellers</h3>
+      <video controls>
+        <source src="seller.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- Botón -->
+  <button class="btn" onclick="window.location.href='https://www.falabella.com.pe/falabella-pe/orders'">Ir a mis compras</button>
+
+  <!-- Listas desplegables -->
+  <div class="dropdown">
+    <select id="negocioSelect" onchange="cargarTiendas()">
+      <option selected disabled>Selecciona un negocio</option>
+      <option value="falabella">Falabella</option>
+      <option value="tottus">Tottus</option>
+      <option value="sodimac">Sodimac</option>
+      <option value="seller">Sellers</option>
+    </select>
+
+    <br><br>
+
+    <select id="tiendaSelect" style="display:none;" onchange="mostrarMapa()">
+      <option selected disabled>Selecciona una tienda</option>
+    </select>
+  </div>
+
+  <!-- Pop-up Mapas -->
+  <div class="popup" id="popupMapa" style="display:none;">
+    <div class="popup-content">
+      <span class="close-btn" onclick="cerrarPopup('popupMapa')">&times;</span>
+      <div id="mapaContenido"></div>
+      <button class="exit-btn" onclick="cerrarPopup('popupMapa')">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    const tiendas = {
+      falabella: {
+        "Falabella Jockey Plaza": "https://www.google.com/maps?q=Falabella+Jockey+Plaza+Av.+Javier+Prado+Este+4200+Lima&output=embed",
+        "Falabella Primavera": "https://www.google.com/maps?q=Falabella+Centro+Comercial+Primavera+Av.+Angamos+Este+2681+Lima&output=embed",
+        // Agregar más tiendas de Falabella aquí
+      },
+      tottus: {
+        "Tottus San Miguel": "https://www.google.com/maps?q=Tottus+San+Miguel+Av.+La+Marina+2000+Lima&output=embed",
+        "Tottus La Molina": "https://www.google.com/maps?q=Tottus+La+Molina+Av.+Raul+Ferrero+1270+Lima&output=embed",
+        // Agregar más tiendas de Tottus aquí
+      },
+      sodimac: {
+        "Sodimac Atocongo": "https://www.google.com/maps?q=Sodimac+Atocongo+Av.+Circunvalacion+1800+Lima&output=embed",
+        "Sodimac Angamos": "https://www.google.com/maps?q=Sodimac+Angamos+Av.+Angamos+Este+1800+Lima&output=embed",
+        // Agregar más tiendas de Sodimac aquí
+      },
+      seller: {
+        "Seller - Jockey Plaza": "https://www.google.com/maps?q=Falabella+Jockey+Plaza+Av.+Javier+Prado+Este+4200+Lima&output=embed",
+        "Seller - Primavera": "https://www.google.com/maps?q=Falabella+Centro+Comercial+Primavera+Av.+Angamos+Este+2681+Lima&output=embed",
+        // Agregar más tiendas de Sellers aquí
+      }
+    };
+
+    function cargarTiendas(){
+      const negocio = document.getElementById("negocioSelect").value;
+      const tiendaSelect = document.getElementById("tiendaSelect");
+      tiendaSelect.innerHTML = '<option selected disabled>Selecciona una tienda</option>';
+
+      if(tiendas[negocio]){
+        for(let tienda in tiendas[negocio]){
+          let opt = document.createElement("option");
+          opt.value = tienda;
+          opt.textContent = tienda;
+          tiendaSelect.appendChild(opt);
+        }
+        tiendaSelect.style.display = "block";
+      } else {
+        tiendaSelect.style.display = "none";
+      }
+    }
+
+    function mostrarMapa(){
+      const negocio = document.getElementById("negocioSelect").value;
+      const tienda = document.getElementById("tiendaSelect").value;
+      const url = tiendas[negocio][tienda];
+
+      let contenido = `<iframe src="${url}" width="600" height="450" style="border:0;" allowfullscreen loading="lazy"></iframe>`;
+
+      if(negocio === "seller"){
+        contenido += `<p style='margin-top:1rem; font-weight:bold;'>Croquis del área de servicio técnico:</p>
+                      <img src="croquis.png" alt="Croquis Servicio Técnico">`;
+      }
+
+      document.getElementById("mapaContenido").innerHTML = contenido;
+      document.getElementById("popupMapa").style.display = "flex";
+    }
+
+    function cerrarPopup(popupId, videoId){
+      const popup = document.getElementById(popupId);
+      popup.classList.add('fade-out');
+      setTimeout(()=>{
+        popup.style.display = 'none';
+        popup.classList.remove('fade-out');
+      },500);
+
+      if(videoId){
+        const video = document.getElementById(videoId);
+        if(video) video.pause();
+      }
+    }
+
+    document.addEventListener('keydown', function(event){
+      if(event.key === "Escape"){
+        if(document.getElementById("popupVideoContainer").style.display !== "none"){
+          cerrarPopup('popupVideoContainer','popupVideo');
+        }
+        if(document.getElementById("popupMapa").style.display !== "none"){
+          cerrarPopup('popupMapa');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
